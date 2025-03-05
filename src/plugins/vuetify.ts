@@ -6,8 +6,10 @@ import {
   VCardItem,
   VCardText,
   VCardTitle,
+  VCol,
   VContainer,
   VMain,
+  VRow,
   VToolbarTitle,
 } from "vuetify/components";
 import "vuetify/styles";
@@ -20,8 +22,10 @@ const vuetify = createVuetify({
     VCardItem,
     VCardText,
     VCardTitle,
+    VCol,
     VContainer,
     VMain,
+    VRow,
     VToolbarTitle,
   },
   theme: {
