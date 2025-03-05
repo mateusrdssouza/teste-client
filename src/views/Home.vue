@@ -1,5 +1,5 @@
 <template>
-  <v-row class="d-flex justify-center ga-8 pt-4">
+  <v-row class="d-flex justify-center ga-8 pt-8">
     <router-link to="/companies" class="link">
       <v-card>
         <v-card-item>
@@ -40,17 +40,19 @@
 
 <script lang="ts">
 import { mdiAccountGroup, mdiDomain } from "@mdi/js";
-import { defineComponent } from "vue";
 
-export default defineComponent({
+export default {
   name: "HomeView",
-  data() {
+  setup() {
+    const companyIcon = mdiDomain;
+    const clientIcon = mdiAccountGroup;
+
     return {
-      companyIcon: mdiDomain,
-      clientIcon: mdiAccountGroup,
+      companyIcon,
+      clientIcon,
     };
   },
-});
+};
 </script>
 
 <style scoped>
