@@ -75,23 +75,11 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="deleteConfirmationDialog" max-width="500px">
-      <v-card>
-        <v-card-title>
-          <span class="headline">Confirmar Exclusão</span>
-        </v-card-title>
-        <v-card-text>
-          Você tem certeza que deseja excluir esta empresa?<br />
-          Os clientes dessa empresa também serão excluídos
-        </v-card-text>
-        <v-card-actions>
-          <v-btn color="grey" @click="closeDeleteConfirmationModal"
-            >Cancelar</v-btn
-          >
-          <v-btn color="red" @click="deleteCompany">Excluir</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <CompanyDelete
+      v-model="deleteConfirmationDialog"
+      :company-id="deleteCompanyId"
+      @delete-company="deleteCompany"
+    />
 
     <v-snackbar
       v-model="snackbar.visible"
@@ -104,6 +92,7 @@
 </template>
 
 <script lang="ts">
+import CompanyDelete from "@/components/company/CompanyDelete.vue";
 import CompanyTable from "@/components/company/CompanyTable.vue";
 import { Company } from "@/types/company";
 import api from "@/utils/axios";
@@ -114,6 +103,7 @@ export default defineComponent({
   name: "CompaniesView",
   components: {
     CompanyTable,
+    CompanyDelete,
   },
   setup() {
     const companies = ref<Company[]>([]);
@@ -123,13 +113,7 @@ export default defineComponent({
     const dialog = ref(false);
     const formIsValid = ref(false);
     const isEditMode = ref(false);
-    const newCompany = ref<{
-      recnum: number;
-      codigo: number;
-      empresa: number;
-      sigla: string;
-      razao_social: string;
-    }>({
+    const newCompany = ref({
       recnum: 0,
       codigo: 0,
       empresa: 0,
@@ -139,7 +123,6 @@ export default defineComponent({
 
     const currentPage = ref(1);
     const totalPages = ref(1);
-    const totalRecords = ref(0);
     const perPage = ref(10);
 
     const fetchCompanies = async (page: number) => {
@@ -150,7 +133,6 @@ export default defineComponent({
 
         companies.value = response.data.data;
         totalPages.value = response.data.last_page;
-        totalRecords.value = response.data.total;
         currentPage.value = page;
       } catch (error) {
         snackbar.value = {
@@ -215,14 +197,6 @@ export default defineComponent({
             visible: true,
             color: "green",
             message: "Empresa cadastrada com sucesso",
-          };
-
-          newCompany.value = {
-            recnum: 0,
-            codigo: 0,
-            empresa: 0,
-            sigla: "",
-            razao_social: "",
           };
         } catch (error) {
           snackbar.value = {
@@ -297,17 +271,12 @@ export default defineComponent({
       fetchCompanies(currentPage.value);
     });
 
-    const snackbar = ref({
-      visible: false,
-      color: "",
-      message: "",
-    });
+    const snackbar = ref({ visible: false, color: "", message: "" });
 
     return {
       companies,
       currentPage,
       totalPages,
-      totalRecords,
       perPage,
       fetchCompanies,
       onPageChange,
@@ -325,6 +294,7 @@ export default defineComponent({
       closeDeleteConfirmationModal,
       deleteConfirmationDialog,
       openDeleteConfirmationModal,
+      deleteCompanyId,
     };
   },
 });
