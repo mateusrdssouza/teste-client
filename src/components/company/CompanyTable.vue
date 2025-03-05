@@ -7,7 +7,7 @@
     :items-per-page="perPage"
     class="table"
   >
-    <template #item.actions="{ item }">
+    <template v-slot:[`item.actions`]="{ item }">
       <div class="d-flex ga-2">
         <v-btn color="blue" small @click="openEditModal(item)">
           <svg :width="24" :height="24" fill="#FFFFFF" viewBox="0 0 24 24">
