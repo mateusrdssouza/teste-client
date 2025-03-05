@@ -107,7 +107,7 @@ export default defineComponent({
   },
   setup() {
     const companies = ref<Company[]>([]);
-    const deleteCompanyId = ref<number | null>(null);
+    const deleteCompanyId = ref<number>(0);
     const deleteConfirmationDialog = ref(false);
 
     const dialog = ref(false);
@@ -176,7 +176,7 @@ export default defineComponent({
     };
 
     const closeDeleteConfirmationModal = () => {
-      deleteCompanyId.value = null;
+      deleteCompanyId.value = 0;
       deleteConfirmationDialog.value = false;
     };
 
