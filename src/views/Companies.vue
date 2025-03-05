@@ -28,6 +28,57 @@
         class="text-center"
       ></v-alert>
     </div>
+
+    <div class="d-flex justify-center align-center pt-6">
+      <v-btn size="x-large" variant="flat" color="#42b983" @click="openModal">
+        Cadastrar empresa
+      </v-btn>
+    </div>
+
+    <v-dialog v-model="dialog" max-width="600px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Cadastrar Empresa</span>
+        </v-card-title>
+        <v-card-text>
+          <v-form ref="form" v-model="formIsValid">
+            <v-text-field
+              v-model="newCompany.codigo"
+              label="Código"
+              required
+            ></v-text-field>
+            <v-text-field
+              v-model="newCompany.empresa"
+              label="Empresa"
+              required
+            ></v-text-field>
+            <v-text-field
+              v-model="newCompany.sigla"
+              label="Sigla"
+              required
+            ></v-text-field>
+            <v-text-field
+              v-model="newCompany.razao_social"
+              label="Razão Social"
+              required
+            ></v-text-field>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn @click="closeModal" color="grey">Cancelar</v-btn>
+          <v-btn
+            @click="registerCompany"
+            :disabled="!formIsValid"
+            color="success"
+            >Cadastrar</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-snackbar v-model="snackbar.visible" :timeout="3000" color="red" top>
+      {{ snackbar.message }}
+    </v-snackbar>
   </div>
 </template>
 
@@ -40,6 +91,15 @@ export default {
   name: "CompaniesView",
   setup() {
     const companies = ref<Company[]>([]);
+
+    const dialog = ref(false);
+    const formIsValid = ref(false);
+    const newCompany = ref({
+      codigo: "",
+      empresa: "",
+      sigla: "",
+      razao_social: "",
+    });
 
     const currentPage = ref(1);
     const totalPages = ref(1);
@@ -54,6 +114,11 @@ export default {
       { title: "Razão Social", key: "razao_social" },
     ];
 
+    const snackbar = ref({
+      visible: false,
+      message: "",
+    });
+
     const fetchCompanies = async (page: number) => {
       try {
         const response = await api.get("/companies", {
@@ -64,13 +129,47 @@ export default {
         totalPages.value = response.data.last_page;
         totalRecords.value = response.data.total;
         currentPage.value = page;
-      } catch (error) {
-        console.error("Erro ao buscar empresas:", error);
+      } catch (error: any) {
+        snackbar.value = {
+          visible: true,
+          message: "Erro ao buscar empresas",
+        };
       }
     };
 
     const onPageChange = (page: number) => {
       fetchCompanies(page);
+    };
+
+    const openModal = () => {
+      dialog.value = true;
+    };
+
+    const closeModal = () => {
+      dialog.value = false;
+    };
+
+    const registerCompany = async () => {
+      if (formIsValid.value) {
+        try {
+          await api.post("/companies", newCompany.value);
+          fetchCompanies(currentPage.value);
+          closeModal();
+
+          newCompany.value = {
+            codigo: "",
+            empresa: "",
+            sigla: "",
+            razao_social: "",
+          };
+        } catch (error: any) {
+          snackbar.value = {
+            visible: true,
+            message:
+              error.response?.data?.message || "Erro ao cadastrar empresa",
+          };
+        }
+      }
     };
 
     onMounted(() => {
@@ -86,6 +185,13 @@ export default {
       headers,
       fetchCompanies,
       onPageChange,
+      dialog,
+      formIsValid,
+      newCompany,
+      openModal,
+      closeModal,
+      registerCompany,
+      snackbar,
     };
   },
 };
