@@ -104,3 +104,10 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.table >>> thead {
+  background-color: #42b983 !important;
+  color: white !important;
+}
+</style>
