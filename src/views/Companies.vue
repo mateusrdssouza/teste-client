@@ -50,21 +50,31 @@
         <v-card-text>
           <v-form ref="form" v-model="formIsValid">
             <v-text-field
-              v-if="!isEditMode"
               v-model="newCompany.codigo"
               label="Código"
               required
+              type="number"
+              :min="1"
+              :max="9999"
+              step="1"
             ></v-text-field>
+
             <v-text-field
               v-model="newCompany.empresa"
               label="Empresa"
               required
+              type="number"
+              :min="1"
+              :max="9999"
+              step="1"
             ></v-text-field>
+
             <v-text-field
               v-model="newCompany.sigla"
               label="Sigla"
               required
             ></v-text-field>
+
             <v-text-field
               v-model="newCompany.razao_social"
               label="Razão Social"
@@ -109,15 +119,15 @@ export default {
     const formIsValid = ref(false);
     const isEditMode = ref(false);
     const newCompany = ref<{
-      recnum: string | number;
-      codigo: string | number;
-      empresa: string | number;
+      recnum: number;
+      codigo: number;
+      empresa: number;
       sigla: string;
       razao_social: string;
     }>({
-      recnum: "",
-      codigo: "",
-      empresa: "",
+      recnum: 0,
+      codigo: 0,
+      empresa: 0,
       sigla: "",
       razao_social: "",
     });
@@ -168,9 +178,9 @@ export default {
     const openModal = () => {
       isEditMode.value = false;
       newCompany.value = {
-        recnum: "",
-        codigo: "",
-        empresa: "",
+        recnum: 0,
+        codigo: 0,
+        empresa: 0,
         sigla: "",
         razao_social: "",
       };
@@ -190,7 +200,13 @@ export default {
     const registerCompany = async () => {
       if (formIsValid.value) {
         try {
-          await api.post("/companies", newCompany.value);
+          const companyData = {
+            ...newCompany.value,
+            codigo: Number(newCompany.value.codigo),
+            empresa: Number(newCompany.value.empresa),
+          };
+
+          await api.post("/companies", companyData);
           fetchCompanies(currentPage.value);
           closeModal();
 
@@ -201,9 +217,9 @@ export default {
           };
 
           newCompany.value = {
-            recnum: "",
-            codigo: "",
-            empresa: "",
+            recnum: 0,
+            codigo: 0,
+            empresa: 0,
             sigla: "",
             razao_social: "",
           };
@@ -221,11 +237,13 @@ export default {
     const updateCompany = async () => {
       if (formIsValid.value) {
         try {
-          await api.put(
-            `/companies/${newCompany.value.recnum}`,
-            newCompany.value
-          );
+          const companyData = {
+            ...newCompany.value,
+            codigo: Number(newCompany.value.codigo),
+            empresa: Number(newCompany.value.empresa),
+          };
 
+          await api.put(`/companies/${newCompany.value.recnum}`, companyData);
           fetchCompanies(currentPage.value);
           closeModal();
 
