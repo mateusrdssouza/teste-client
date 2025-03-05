@@ -1,24 +1,31 @@
-# teste-client
+### Instruções para configuração
 
-## Project setup
-```
-npm install
-```
+---
 
-### Compiles and hot-reloads for development
-```
-npm run serve
+#### Acessar a pasta do projeto
+
+```bash
+$ cd teste-client
 ```
 
-### Compiles and minifies for production
-```
-npm run build
+#### Instalar as dependências
+
+```bash
+$ npm install
 ```
 
-### Lints and fixes files
-```
-npm run lint
+#### Criar o arquivo .env
+
+```bash
+$ cp .env.example .env
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+#### Executar o projeto
+
+```bash
+$ npm run serve
+```
+
+#### Acessar o Client
+
+- ##### [http://localhost:8080/](http://localhost:8080/)
