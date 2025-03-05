@@ -31,7 +31,7 @@
           <v-form ref="form" v-model="formIsValid">
             <v-text-field
               v-model="newCompany.codigo"
-              label="Código"
+              label="Código da Empresa"
               required
               type="number"
               :min="1"
