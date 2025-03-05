@@ -3,36 +3,15 @@
     <h1>Empresas</h1>
 
     <div v-if="companies.length" class="pt-4">
-      <v-data-table
-        :headers="headers"
-        :items="companies"
-        item-key="recnum"
-        :items-per-page="perPage"
-        class="table"
-      >
-        <template #item.actions="{ item }">
-          <div class="d-flex ga-2">
-            <v-btn color="blue" small @click="openEditModal(item)">
-              <svg :width="24" :height="24" fill="#FFFFFF" viewBox="0 0 24 24">
-                <path :d="updateIcon" />
-              </svg>
-            </v-btn>
-
-            <v-btn color="red" small @click="openDeleteConfirmationModal(item)">
-              <svg :width="24" :height="24" fill="#FFFFFF" viewBox="0 0 24 24">
-                <path :d="deleteIcon" />
-              </svg>
-            </v-btn>
-          </div>
-        </template>
-      </v-data-table>
-
-      <v-pagination
-        v-model:model-value="currentPage"
-        :length="totalPages"
-        :total-visible="5"
-        @update:model-value="onPageChange"
-      ></v-pagination>
+      <CompanyTable
+        :companies="companies"
+        :current-page="currentPage"
+        :total-pages="totalPages"
+        :per-page="perPage"
+        @page-change="onPageChange"
+        @edit-company="openEditModal"
+        @delete-company="openDeleteConfirmationModal"
+      />
     </div>
 
     <div v-if="!companies.length" class="pt-4 d-flex justify-center">
@@ -134,13 +113,17 @@
 </template>
 
 <script lang="ts">
+import CompanyTable from "@/components/company/CompanyTable.vue";
 import { Company } from "@/types/company";
 import api from "@/utils/axios";
-import { mdiDelete, mdiPencil } from "@mdi/js";
-import { onMounted, ref } from "vue";
+import { AxiosError } from "axios";
+import { defineComponent, onMounted, ref } from "vue";
 
-export default {
+export default defineComponent({
   name: "CompaniesView",
+  components: {
+    CompanyTable,
+  },
   setup() {
     const companies = ref<Company[]>([]);
     const deleteCompanyId = ref<number | null>(null);
@@ -168,21 +151,6 @@ export default {
     const totalRecords = ref(0);
     const perPage = ref(10);
 
-    const headers = [
-      { title: "ID", key: "recnum" },
-      { title: "Código", key: "codigo" },
-      { title: "Empresa", key: "empresa" },
-      { title: "Sigla", key: "sigla" },
-      { title: "Razão Social", key: "razao_social" },
-      { title: "Ações", key: "actions" },
-    ];
-
-    const snackbar = ref({
-      visible: false,
-      color: "",
-      message: "",
-    });
-
     const fetchCompanies = async (page: number) => {
       try {
         const response = await api.get("/companies", {
@@ -193,7 +161,7 @@ export default {
         totalPages.value = response.data.last_page;
         totalRecords.value = response.data.total;
         currentPage.value = page;
-      } catch (error: any) {
+      } catch (error) {
         snackbar.value = {
           visible: true,
           color: "red",
@@ -203,6 +171,7 @@ export default {
     };
 
     const onPageChange = (page: number) => {
+      currentPage.value = page;
       fetchCompanies(page);
     };
 
@@ -264,12 +233,14 @@ export default {
             sigla: "",
             razao_social: "",
           };
-        } catch (error: any) {
+        } catch (error) {
           snackbar.value = {
             visible: true,
             color: "red",
             message:
-              error.response?.data?.message || "Erro ao cadastrar empresa",
+              error instanceof AxiosError
+                ? error.response?.data?.message
+                : "Erro ao cadastrar empresa",
           };
         }
       }
@@ -293,12 +264,14 @@ export default {
             color: "green",
             message: "Empresa atualizada com sucesso",
           };
-        } catch (error: any) {
+        } catch (error) {
           snackbar.value = {
             visible: true,
             color: "red",
             message:
-              error.response?.data?.message || "Erro ao atualizar empresa",
+              error instanceof AxiosError
+                ? error.response?.data?.message
+                : "Erro ao atualizar empresa",
           };
         }
       }
@@ -316,11 +289,14 @@ export default {
             color: "green",
             message: "Empresa excluída com sucesso",
           };
-        } catch (error: any) {
+        } catch (error) {
           snackbar.value = {
             visible: true,
             color: "red",
-            message: error.response?.data?.message || "Erro ao excluir empresa",
+            message:
+              error instanceof AxiosError
+                ? error.response?.data?.message
+                : "Erro ao excluir empresa",
           };
         }
       }
@@ -330,8 +306,11 @@ export default {
       fetchCompanies(currentPage.value);
     });
 
-    const updateIcon = mdiPencil;
-    const deleteIcon = mdiDelete;
+    const snackbar = ref({
+      visible: false,
+      color: "",
+      message: "",
+    });
 
     return {
       companies,
@@ -339,7 +318,6 @@ export default {
       totalPages,
       totalRecords,
       perPage,
-      headers,
       fetchCompanies,
       onPageChange,
       dialog,
@@ -356,16 +334,7 @@ export default {
       closeDeleteConfirmationModal,
       deleteConfirmationDialog,
       openDeleteConfirmationModal,
-      updateIcon,
-      deleteIcon,
     };
   },
-};
+});
 </script>
-
-<style scoped>
-.table >>> thead {
-  background-color: #42b983 !important;
-  color: white !important;
-}
-</style>
