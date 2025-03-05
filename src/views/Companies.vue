@@ -2,7 +2,7 @@
   <div>
     <h1>Empresas</h1>
 
-    <div v-if="companies.length" class="pt-4">
+    <div class="pt-4">
       <CompanyTable
         :companies="companies"
         :current-page="currentPage"
@@ -12,15 +12,6 @@
         @edit-company="openEditModal"
         @delete-company="openDeleteConfirmationModal"
       />
-    </div>
-
-    <div v-if="!companies.length" class="pt-4 d-flex justify-center">
-      <v-alert
-        text="Nenhuma empresa cadastrada"
-        type="info"
-        variant="tonal"
-        class="text-center"
-      ></v-alert>
     </div>
 
     <div class="d-flex justify-center align-center pt-6">

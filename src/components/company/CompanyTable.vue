@@ -1,44 +1,44 @@
 <template>
-  <div>
-    <v-data-table
-      :headers="headers"
-      :items="companies"
-      item-key="recnum"
-      :items-per-page="perPage"
-      class="table"
-    >
-      <template #item.actions="{ item }">
-        <div class="d-flex ga-2">
-          <v-btn color="blue" small @click="openEditModal(item)">
-            <svg :width="24" :height="24" fill="#FFFFFF" viewBox="0 0 24 24">
-              <path :d="updateIcon" />
-            </svg>
-          </v-btn>
+  <v-data-table
+    v-if="companies.length"
+    :headers="headers"
+    :items="companies"
+    item-key="recnum"
+    :items-per-page="perPage"
+    class="table"
+  >
+    <template #item.actions="{ item }">
+      <div class="d-flex ga-2">
+        <v-btn color="blue" small @click="openEditModal(item)">
+          <svg :width="24" :height="24" fill="#FFFFFF" viewBox="0 0 24 24">
+            <path :d="updateIcon" />
+          </svg>
+        </v-btn>
 
-          <v-btn color="red" small @click="openDeleteConfirmationModal(item)">
-            <svg :width="24" :height="24" fill="#FFFFFF" viewBox="0 0 24 24">
-              <path :d="deleteIcon" />
-            </svg>
-          </v-btn>
-        </div>
-      </template>
-    </v-data-table>
+        <v-btn color="red" small @click="openDeleteConfirmationModal(item)">
+          <svg :width="24" :height="24" fill="#FFFFFF" viewBox="0 0 24 24">
+            <path :d="deleteIcon" />
+          </svg>
+        </v-btn>
+      </div>
+    </template>
+  </v-data-table>
 
-    <v-pagination
-      :length="totalPages"
-      :total-visible="5"
-      :model-value="currentPage"
-      @update:model-value="onPageChange"
-    ></v-pagination>
+  <v-pagination
+    v-if="companies.length"
+    :length="totalPages"
+    :total-visible="5"
+    :model-value="currentPage"
+    @update:model-value="onPageChange"
+  ></v-pagination>
 
-    <div v-if="!companies.length" class="pt-4 d-flex justify-center">
-      <v-alert
-        text="Nenhuma empresa cadastrada"
-        type="info"
-        variant="tonal"
-        class="text-center"
-      ></v-alert>
-    </div>
+  <div v-if="!companies.length" class="pt-4 d-flex justify-center">
+    <v-alert
+      text="Nenhuma empresa cadastrada"
+      type="info"
+      variant="tonal"
+      class="text-center"
+    ></v-alert>
   </div>
 </template>
 
