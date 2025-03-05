@@ -14,6 +14,9 @@
           <v-btn color="blue" small @click="openEditModal(item)">
             Editar
           </v-btn>
+          <v-btn color="red" small @click="openDeleteConfirmationModal(item)">
+            Excluir
+          </v-btn>
         </template>
       </v-data-table>
 
@@ -95,6 +98,24 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog v-model="deleteConfirmationDialog" max-width="500px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Confirmar Exclusão</span>
+        </v-card-title>
+        <v-card-text>
+          Você tem certeza que deseja excluir esta empresa?<br />
+          Os clientes dessa empresa também serão excluídos
+        </v-card-text>
+        <v-card-actions>
+          <v-btn color="grey" @click="closeDeleteConfirmationModal"
+            >Cancelar</v-btn
+          >
+          <v-btn color="red" @click="deleteCompany">Excluir</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-snackbar
       v-model="snackbar.visible"
       :timeout="3000"
@@ -114,6 +135,8 @@ export default {
   name: "CompaniesView",
   setup() {
     const companies = ref<Company[]>([]);
+    const deleteCompanyId = ref<number | null>(null);
+    const deleteConfirmationDialog = ref(false);
 
     const dialog = ref(false);
     const formIsValid = ref(false);
@@ -197,6 +220,16 @@ export default {
       dialog.value = false;
     };
 
+    const openDeleteConfirmationModal = (company: Company) => {
+      deleteCompanyId.value = company.recnum;
+      deleteConfirmationDialog.value = true;
+    };
+
+    const closeDeleteConfirmationModal = () => {
+      deleteCompanyId.value = null;
+      deleteConfirmationDialog.value = false;
+    };
+
     const registerCompany = async () => {
       if (formIsValid.value) {
         try {
@@ -263,6 +296,28 @@ export default {
       }
     };
 
+    const deleteCompany = async () => {
+      if (deleteCompanyId.value) {
+        try {
+          await api.delete(`/companies/${deleteCompanyId.value}`);
+          fetchCompanies(currentPage.value);
+          closeDeleteConfirmationModal();
+
+          snackbar.value = {
+            visible: true,
+            color: "green",
+            message: "Empresa excluída com sucesso",
+          };
+        } catch (error: any) {
+          snackbar.value = {
+            visible: true,
+            color: "red",
+            message: error.response?.data?.message || "Erro ao excluir empresa",
+          };
+        }
+      }
+    };
+
     onMounted(() => {
       fetchCompanies(currentPage.value);
     });
@@ -286,6 +341,10 @@ export default {
       updateCompany,
       snackbar,
       isEditMode,
+      deleteCompany,
+      closeDeleteConfirmationModal,
+      deleteConfirmationDialog,
+      openDeleteConfirmationModal,
     };
   },
 };
