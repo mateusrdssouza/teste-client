@@ -11,12 +11,19 @@
         class="table"
       >
         <template #item.actions="{ item }">
-          <v-btn color="blue" small @click="openEditModal(item)">
-            Editar
-          </v-btn>
-          <v-btn color="red" small @click="openDeleteConfirmationModal(item)">
-            Excluir
-          </v-btn>
+          <div class="d-flex ga-2">
+            <v-btn color="blue" small @click="openEditModal(item)">
+              <svg :width="24" :height="24" fill="#FFFFFF" viewBox="0 0 24 24">
+                <path :d="updateIcon" />
+              </svg>
+            </v-btn>
+
+            <v-btn color="red" small @click="openDeleteConfirmationModal(item)">
+              <svg :width="24" :height="24" fill="#FFFFFF" viewBox="0 0 24 24">
+                <path :d="deleteIcon" />
+              </svg>
+            </v-btn>
+          </div>
         </template>
       </v-data-table>
 
@@ -129,6 +136,7 @@
 <script lang="ts">
 import { Company } from "@/types/company";
 import api from "@/utils/axios";
+import { mdiDelete, mdiPencil } from "@mdi/js";
 import { onMounted, ref } from "vue";
 
 export default {
@@ -322,6 +330,9 @@ export default {
       fetchCompanies(currentPage.value);
     });
 
+    const updateIcon = mdiPencil;
+    const deleteIcon = mdiDelete;
+
     return {
       companies,
       currentPage,
@@ -345,6 +356,8 @@ export default {
       closeDeleteConfirmationModal,
       deleteConfirmationDialog,
       openDeleteConfirmationModal,
+      updateIcon,
+      deleteIcon,
     };
   },
 };
